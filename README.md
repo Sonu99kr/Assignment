@@ -2,6 +2,8 @@
 
 Suffragium is a real‑time polling application where anyone can quickly create a poll, share a link, and watch votes update live without page refresh. It consists of a React/Vite frontend and a Node.js/Express backend with MongoDB and Socket.io for real‑time updates.
 
+Live app: [`https://suffragium-frontend.vercel.app`](https://suffragium-frontend.vercel.app)
+
 ### Features
 
 - **Create time‑boxed polls**
