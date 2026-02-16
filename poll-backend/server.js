@@ -7,17 +7,19 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
-app.use(cors({
-  origin: http://localhost:3000,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "https://suffragium-frontend.vercel.app",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.set("trust proxy", true);
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://suffragium-frontend.vercel.app",
   },
 });
 
