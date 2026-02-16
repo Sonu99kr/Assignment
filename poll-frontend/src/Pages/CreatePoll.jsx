@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const CreatePoll = () => {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const [expiryMinutes, setExpiryMinutes] = useState(10);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleOptionChange = (index, value) => {
     const updated = [...options];
@@ -27,16 +29,18 @@ const CreatePoll = () => {
 
       const expiresIn = Number(expiryMinutes) * 60 * 1000;
 
-      const res = await axios.post("http://localhost:4000/api/polls", {
-        question,
-        options,
-        expiresIn,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/polls`,
+        {
+          question,
+          options,
+          expiresIn,
+        },
+      );
 
       const pollId = res.data._id;
 
-      // ✅ Professional UX: Redirect immediately
-      window.location.href = `/poll/${pollId}`;
+      navigate(`/poll/${pollId}`);
     } catch (err) {
       alert("Error creating poll");
       setLoading(false);
@@ -53,14 +57,12 @@ const CreatePoll = () => {
       </style>
 
       <div className="min-h-screen bg-black text-white flex flex-col">
-        {/* NAVBAR */}
         <nav className="flex justify-between items-center px-20 py-6 border-b border-green-900/40 bg-black/80 backdrop-blur-md">
           <h1 className="text-2xl font-semibold text-green-500 tracking-wide">
             Suffragium: Where ideas get voted on
           </h1>
         </nav>
 
-        {/* HERO */}
         <div className="flex flex-col items-center text-center mt-20">
           <h2 className="text-5xl font-bold max-w-3xl leading-tight">
             Create & Share
@@ -73,7 +75,6 @@ const CreatePoll = () => {
           </p>
         </div>
 
-        {/* FORM */}
         <div className="flex justify-center mt-20">
           <div className="w-[700px] bg-gradient-to-br from-green-950 to-black border border-green-900 rounded-3xl p-10 shadow-[0_0_50px_rgba(34,197,94,0.15)]">
             <h3 className="text-3xl font-semibold mb-8 text-center">

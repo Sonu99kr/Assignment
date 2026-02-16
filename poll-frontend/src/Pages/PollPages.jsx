@@ -3,7 +3,10 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:4000");
+const socket = io(import.meta.env.VITE_API_URL, {
+  transports: ["websocket"],
+  withCredentials: true,
+});
 
 const PollPage = () => {
   const { id } = useParams();
@@ -32,7 +35,9 @@ const PollPage = () => {
 
   const fetchPoll = async () => {
     try {
-      const res = await axios.get(`http://localhost:4000/api/polls/${id}`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/polls/${id}`,
+      );
       setPoll(res.data);
 
       const voterId = localStorage.getItem("voterId");
@@ -99,7 +104,7 @@ const PollPage = () => {
     if (isExpired) return;
 
     try {
-      await axios.post(`http://localhost:4000/api/polls/${id}/vote`, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/polls/${id}/vote`, {
         optionIndex: index,
         voterId: localStorage.getItem("voterId"),
       });
@@ -121,13 +126,11 @@ const PollPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
-      {/* NAVBAR */}
       <nav className="px-20 py-6 border-b border-green-900/40 flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-green-500">
           Suffragium: Every vote counts
         </h1>
 
-        {/* Button Group */}
         <div className="flex items-center gap-3 bg-green-950/40 px-4 py-2 rounded-2xl border border-green-900">
           <button
             onClick={handleShare}
@@ -147,7 +150,6 @@ const PollPage = () => {
 
       <div className="flex justify-center mt-24">
         <div className="relative w-[720px]">
-          {/* TIMER (Now properly aligned to card) */}
           <div
             className={`absolute -top-16 right-0 px-6 py-3 rounded-xl font-semibold text-lg tracking-wide shadow-lg
           ${
@@ -159,14 +161,11 @@ const PollPage = () => {
             {isExpired ? "Poll Ended" : `Ends In: ${timeLeft}`}
           </div>
 
-          {/* CARD */}
           <div className="bg-gradient-to-br from-green-950 to-black border border-green-900 rounded-3xl p-12 shadow-[0_0_50px_rgba(34,197,94,0.15)]">
-            {/* QUESTION */}
             <h2 className="text-3xl font-semibold mb-12 text-center leading-snug">
               {poll.question}
             </h2>
 
-            {/* OPTIONS */}
             <div className="space-y-6">
               {poll.options.map((option, index) => {
                 const percentage =
@@ -205,7 +204,6 @@ const PollPage = () => {
               })}
             </div>
 
-            {/* DIVIDER */}
             <div className="mt-12 border-t border-green-900/40 pt-6 text-center">
               <p className="text-green-400 text-lg font-medium">
                 Total Votes: {totalVotes}
