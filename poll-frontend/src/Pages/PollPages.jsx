@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 
@@ -14,6 +14,7 @@ const PollPage = () => {
   const [voted, setVoted] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const [isExpired, setIsExpired] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem("voterId")) {
@@ -45,7 +46,11 @@ const PollPage = () => {
         setVoted(true);
       }
     } catch (err) {
-      console.error("Error fetching poll");
+      if (err.response?.status === 400 || err.response?.status === 404) {
+        setNotFound(true);
+      } else {
+        console.error("Error fetching poll");
+      }
     }
   };
 
@@ -120,6 +125,37 @@ const PollPage = () => {
     alert("Link copied!");
   };
 
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col">
+        <nav className="px-20 py-6 border-b border-green-900/40">
+          <h1 className="text-2xl font-semibold text-green-500">Suffragium</h1>
+        </nav>
+
+        <div className="flex flex-col items-center justify-center flex-1 text-center">
+          <h2 className="text-4xl font-bold text-red-400 mb-6">
+            Poll Not Found
+          </h2>
+
+          <p className="text-slate-400 mb-10 text-lg max-w-md">
+            This poll may have expired or has been removed from our system.
+          </p>
+
+          <a
+            href="/"
+            className="bg-green-600 hover:bg-green-700 transition px-8 py-3 rounded-xl font-medium shadow-lg shadow-green-900/40"
+          >
+            Create New Poll
+          </a>
+        </div>
+
+        <footer className="py-8 text-center text-slate-500 border-t border-green-900/40">
+          © {new Date().getFullYear()} Suffragium
+        </footer>
+      </div>
+    );
+  }
+
   if (!poll) return <div className="text-white p-10">Loading...</div>;
 
   const totalVotes = poll.options.reduce((acc, opt) => acc + opt.votes, 0);
@@ -143,7 +179,7 @@ const PollPage = () => {
     <div className="min-h-screen bg-black text-white flex flex-col">
       <nav className="px-20 py-6 border-b border-green-900/40 flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-green-500">
-          Suffragium: Every vote counts
+          <Link to="/">Suffragium: Every vote counts</Link>
         </h1>
 
         <div className="flex items-center gap-3 bg-green-950/40 px-4 py-2 rounded-2xl border border-green-900">
