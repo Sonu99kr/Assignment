@@ -124,6 +124,21 @@ const PollPage = () => {
 
   const totalVotes = poll.options.reduce((acc, opt) => acc + opt.votes, 0);
 
+  let winnerText = "";
+
+  if (isExpired && totalVotes > 0) {
+    const maxVotes = Math.max(...poll.options.map((opt) => opt.votes));
+    const winners = poll.options.filter((opt) => opt.votes === maxVotes);
+
+    if (winners.length === 1) {
+      winnerText = `🏆 Winner: ${winners[0].text}`;
+    } else {
+      winnerText = `🤝 It's a tie between ${winners
+        .map((w) => w.text)
+        .join(" & ")}`;
+    }
+  }
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <nav className="px-20 py-6 border-b border-green-900/40 flex justify-between items-center">
@@ -204,14 +219,22 @@ const PollPage = () => {
               })}
             </div>
 
-            <div className="mt-12 border-t border-green-900/40 pt-6 text-center">
+            <div className="mt-12 border-t border-green-900/40 pt-6 text-center space-y-4">
               <p className="text-green-400 text-lg font-medium">
                 Total Votes: {totalVotes}
               </p>
 
-              {isExpired && (
-                <p className="mt-3 text-red-400 font-medium">
-                  This poll has ended.
+              {isExpired && totalVotes > 0 && (
+                <div className="bg-green-950 border border-green-600 rounded-xl p-6">
+                  <p className="text-xl font-semibold text-green-300">
+                    {winnerText}
+                  </p>
+                </div>
+              )}
+
+              {isExpired && totalVotes === 0 && (
+                <p className="text-red-400 font-medium">
+                  Poll ended with no votes.
                 </p>
               )}
             </div>
