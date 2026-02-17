@@ -1,8 +1,8 @@
 ## Suffragium – Real-Time Polling App
 
-Suffragium is a real‑time polling application where anyone can quickly create a poll, share a link, and watch votes update live without page refresh. It consists of a React/Vite frontend and a Node.js/Express backend with MongoDB and Socket.io for real‑time updates.
-
 Live app: [`https://suffragium-frontend.vercel.app`](https://suffragium-frontend.vercel.app)
+
+Suffragium is a real‑time polling application where anyone can quickly create a poll, share a link, and watch votes update live without page refresh. It consists of a React/Vite frontend and a Node.js/Express backend with MongoDB and Socket.io for real‑time updates.
 
 ### Features
 
@@ -15,9 +15,17 @@ Live app: [`https://suffragium-frontend.vercel.app`](https://suffragium-frontend
   - After voting or when the poll ends, results are shown as percentages with animated progress bars.
   - Results update instantly across all connected clients via Socket.io.
 
+- **Winner / tie summary when poll ends**
+  - When a poll expires, the UI highlights the **winner** (highest votes).
+  - If multiple options share the highest votes, the UI shows a **tie** message.
+  - If a poll ends with **zero votes**, the UI shows a clear “no votes” message.
+
 - **Link‑based sharing**
   - Each poll gets a unique URL (e.g. `/poll/:id`).
   - Share via the native Web Share API when available, or automatically copy the link to the clipboard as a fallback.
+
+- **Friendly invalid/expired poll handling**
+  - If a user opens a poll link that is missing/invalid/expired, the app shows a dedicated **“Poll Not Found”** screen with a CTA to create a new poll.
 
 - **Client‑side “one vote per device”**
   - Each browser is assigned a random `voterId` stored in `localStorage`.
@@ -31,6 +39,9 @@ Live app: [`https://suffragium-frontend.vercel.app`](https://suffragium-frontend
 - **Basic rate limiting**
   - Backend rate limiter on the vote endpoint reduces abuse from rapid repeated vote attempts from the same client/IP.
 
+- **SPA routing support for deployment**
+  - Includes a Vercel rewrite config (`poll-frontend/vercel.json`) so direct visits to routes like `/poll/:id` work correctly.
+
 ### Architecture
 
 - **Frontend (`poll-frontend`)**
@@ -41,6 +52,7 @@ Live app: [`https://suffragium-frontend.vercel.app`](https://suffragium-frontend
   - Axios for HTTP calls to the backend (`VITE_API_URL`).
   - Socket.io client for subscribing to real‑time poll updates.
   - Tailwind‑style utility classes for a modern dark theme UI.
+  - Vercel SPA rewrite config via `vercel.json`.
 
 - **Backend (`poll-backend`)**
   - Node.js + Express server (`server.js`).
@@ -123,11 +135,18 @@ Live app: [`https://suffragium-frontend.vercel.app`](https://suffragium-frontend
     - Invalid `optionIndex` (undefined, negative, or out of range).
   - Returns clear JSON error messages for all of the above.
 
+- **Expired/invalid poll links**
+  - If fetching a poll returns “not found” (e.g. invalid ID or TTL‑deleted poll), the UI shows a dedicated “Poll Not Found” page instead of a broken screen.
+
 - **Poll expiry behavior**
   - When the countdown reaches zero on the client, the UI:
     - Marks the poll as ended.
     - Disables further voting interactions.
   - Backend also checks `expiresAt` to prevent late votes even if the client is outdated or manipulated.
+
+- **Winner/tie/no‑votes outcomes**
+  - Winner and tie detection is handled on the client after expiry.
+  - If a poll ends with zero votes, the UI explicitly calls that out.
 
 - **Resilience of real‑time updates**
   - On initial load, the poll is fetched via HTTP (so the page still works if the WebSocket is briefly unavailable).
