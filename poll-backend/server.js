@@ -19,7 +19,9 @@ app.set("trust proxy", true);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://suffragium-frontend.vercel.app",
+    origin: ["https://suffragium-frontend.vercel.app"],
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
