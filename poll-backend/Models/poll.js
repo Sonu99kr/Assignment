@@ -16,7 +16,7 @@ const pollSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true,
-      index: { expires: 0 },
+      index: { expires: 24 * 60 * 60 },
     },
   },
   { timestamps: true },
